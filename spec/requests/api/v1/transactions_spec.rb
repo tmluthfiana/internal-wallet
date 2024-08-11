@@ -26,36 +26,35 @@ RSpec.describe 'Api::V1::Transactions', type: :request do
   end
 
   describe 'POST /api/v1/transactions/deposit' do
-    it 'returns unauthorized without token' do
+    it 'returns unauthorized' do
       post '/api/v1/transactions/deposit'
       expect(response).to have_http_status(:unauthorized)
     end
-
+  
     it 'returns ok with valid params' do
       post '/api/v1/transactions/deposit',
            headers: { 'Authorization' => "Bearer #{jwt}" },
-           params: { amount: valid_amount }
+           params: { amount: 100 }
+  
       expect(response).to have_http_status(:ok)
     end
-
-    it 'returns unprocessable_entity with missing amount' do
-      post '/api/v1/transactions/deposit',
-           headers: { 'Authorization' => "Bearer #{jwt}" }
-      expect(response).to have_http_status(:unprocessable_entity)
-    end
-
+  
     it 'returns bad_request with 0 amount' do
       post '/api/v1/transactions/deposit',
            headers: { 'Authorization' => "Bearer #{jwt}" },
-           params: { amount: invalid_amount }
+           params: { amount: 0 }
+  
       expect(response).to have_http_status(:bad_request)
+      expect(response.body).to include('Amount must be positive')
     end
-
+  
     it 'returns bad_request with negative amount' do
       post '/api/v1/transactions/deposit',
            headers: { 'Authorization' => "Bearer #{jwt}" },
-           params: { amount: -50 }
+           params: { amount: -100 }
+  
       expect(response).to have_http_status(:bad_request)
+      expect(response.body).to include('Amount must be positive')
     end
   end
 

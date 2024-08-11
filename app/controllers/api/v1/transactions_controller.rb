@@ -7,14 +7,31 @@ class Api::V1::TransactionsController < ApplicationController
   end
 
   def deposit
-    process_transaction(params[:amount]) do
-      if TransactionServices::Deposit.new(wallet_id: @wallet.id, amount: params[:amount].to_i).call
-        render_success('deposit succeed')
-      end
+    raise ActionController::ParameterMissing, 'amount is required' if params[:amount].blank?
+  
+    amount = params[:amount].to_i
+  
+    if amount <= 0
+      return render_raw_response({
+                                   title: Rack::Utils::HTTP_STATUS_CODES[400],
+                                   detail: 'Amount must be positive'
+                                 }, status: :bad_request)
+    end
+  
+    if TransactionServices::Deposit.new(wallet_id: @wallet.id, amount: amount).call
+      render_raw_response({
+                            title: Rack::Utils::HTTP_STATUS_CODES[200],
+                            detail: 'Deposit succeeded'
+                          }, status: :ok)
     end
   rescue ActiveRecord::RecordInvalid => e
     render_bad_request(e)
-  end
+  rescue ArgumentError => e
+    render_raw_response({
+                          title: Rack::Utils::HTTP_STATUS_CODES[400],
+                          detail: e.message
+                        }, status: :bad_request)
+  end  
 
   def withdraw
     process_transaction(params[:amount]) do
@@ -50,20 +67,5 @@ class Api::V1::TransactionsController < ApplicationController
     raise ActionController::ParameterMissing, 'amount is required' if amount.blank?
 
     yield if block_given?
-  end
-
-  def render_transactions(transactions)
-    render_raw_response({
-      status: '200',
-      title: Rack::Utils::HTTP_STATUS_CODES[200],
-      data: transactions.map(&:to_builder).map(&:attributes!)
-    }, status: :ok)
-  end
-
-  def render_success(detail)
-    render_raw_response({
-      title: Rack::Utils::HTTP_STATUS_CODES[200],
-      detail: detail
-    }, status: :ok)
   end
 end
