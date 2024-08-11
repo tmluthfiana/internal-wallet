@@ -9,26 +9,22 @@ Tool | Description
 **[Ruby 3.2.1](https://ruby-doc.org/core-2.4.1/)** | Ruby
 **[Rspec](https://github.com/rspec/rspec-rails)** | Testing tool
 **[PostgreSQL](https://www.postgresql.org/)** | Database
-**[ULID](https://github.com/ulid/spec)** | identifier
 
 ### Installation
 
 How to [Install Rails](http://installrails.com/)
 
 ```sh
-$ git clone git@github.com:emheri/atask-wallet.git
-$ cd atask-wallet
+$ git clone git@github.com:tmluthfiana/internal-wallet.git
+$ cd internal-wallet
 $ bundle install
 $ rake db:create && rake db:migrate
-$ ssh-keygen -t rsa -P "" -b 4096 -m PEM -f keys/jwtRS256.key
-$ rails s
 ```
 
 ### Run Unit Testing
 
 ```sh
-$ cd atask_assessment
-$ bundle exec rspec spec/
+$ rspec spec/
 ```
 
 ### Features

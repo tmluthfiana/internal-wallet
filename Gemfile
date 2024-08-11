@@ -15,7 +15,6 @@ gem 'rack-cors'
 gem 'rails', '~> 7.0.4', '>= 7.0.4.3'
 # gem "redis", "~> 4.0"
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
-gem 'ulid-rails'
 
 group :development, :test do
   gem 'byebug'
@@ -28,8 +27,4 @@ group :development do
   gem 'rubocop', require: false
   gem 'rubocop-rails', require: false
 end
-
-# group :test do
-#   gem 'shoulda-matchers', '~> 4.0'
-# end
 
