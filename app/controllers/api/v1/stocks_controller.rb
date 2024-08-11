@@ -1,18 +1,19 @@
 class Api::V1::StocksController < ApplicationController
+  include Response
 
   def price_all
     handle_request do
       response = RapidApi::LatestStockPrice.price_all
-      render_raw_response(format_response(response), status: :ok)
+      render_success(format_response(response))
     end
   end
 
   def price
     handle_request do
-      raise ActionController::ParameterMissing, 'Indicies is required' if params[:Indices].blank?
+      raise ActionController::ParameterMissing, 'Indices is required' if params[:Indices].blank?
 
       response = RapidApi::LatestStockPrice.price(params[:Indices])
-      render_raw_response(format_response(response), status: :ok)
+      render_success(format_response(response))
     end
   end
 
@@ -21,18 +22,11 @@ class Api::V1::StocksController < ApplicationController
   def handle_request
     yield
   rescue HTTParty::Error => e
-    render_raw_response({
-                          status: '503',
-                          title: Rack::Utils::HTTP_STATUS_CODES[503],
-                          error: 'Service is currently unavailable',
-                          detail: e.message
-                        }, status: :service_unavailable)
+    render_error_response(:service_unavailable, 'Service is currently unavailable', e.message)
   end
 
   def format_response(response)
     {
-      status: '200',
-      title: Rack::Utils::HTTP_STATUS_CODES[200],
       data: JSON.parse(response.body)
     }
   end

@@ -35,13 +35,13 @@ RSpec.describe 'Api::V1::Stocks', type: :request do
     it 'returns unprocessable_entity if Indices param is missing' do
       get '/api/v1/stocks/price', headers: { 'Authorization' => "Bearer #{jwt}" }
       expect(response).to have_http_status(:unprocessable_entity)
-      expect(response.parsed_body['detail']).to eq('param is missing or the value is empty: Indicies is required')
+      expect(response.parsed_body['detail']).to eq('param is missing or the value is empty: Indices is required')
     end
 
     it 'returns unprocessable_entity if Indices param is empty' do
       get '/api/v1/stocks/price', headers: { 'Authorization' => "Bearer #{jwt}" }, params: { Indices: '' }
       expect(response).to have_http_status(:unprocessable_entity)
-      expect(response.parsed_body['detail']).to eq('param is missing or the value is empty: Indicies is required')
+      expect(response.parsed_body['detail']).to eq('param is missing or the value is empty: Indices is required')
     end
 
     it 'returns a list of stock prices in JSON format for valid Indices' do

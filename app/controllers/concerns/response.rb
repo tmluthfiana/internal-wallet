@@ -11,19 +11,19 @@ module Response
   end
 
   def render_unauthorized(exception)
-    render json: { error: exception.message }, status: :unauthorized
+    render_error_response(:unauthorized, 'Unauthorized', exception.message)
   end
 
   def render_unprocessable_entity(exception)
-    render_error_response(:unprocessable_entity, exception.message)
+    render_error_response(:unprocessable_entity, 'Unprocessable Entity', exception.message)
   end
 
   def render_not_found(exception)
-    render_error_response(:not_found, exception.message)
+    render_error_response(:not_found, 'Not Found', exception.message)
   end
 
   def render_bad_request(exception)
-    render_error_response(:bad_request, exception.message)
+    render_error_response(:bad_request, 'Bad Request', exception.message)
   end
 
   def render_success(detail)
@@ -40,23 +40,26 @@ module Response
 
   private
 
-  def render_error_response(status, detail)
+  def render_error_response(status, title, detail)
     render_raw_response(
-      build_response_hash(status, detail),
+      {
+        error: title,
+        detail: detail
+      },
       status: status
     )
   end
 
   def render_standard_response(status, detail)
     render_raw_response(
-      build_response_hash(status, detail),
+      build_response_hash(status, nil, detail),
       status: status
     )
   end
 
-  def build_response_hash(status, detail)
+  def build_response_hash(status, title, detail)
     {
-      title: Rack::Utils::HTTP_STATUS_CODES[Rack::Utils.status_code(status)],
+      title: title || Rack::Utils::HTTP_STATUS_CODES[Rack::Utils.status_code(status)],
       detail: detail
     }
   end
