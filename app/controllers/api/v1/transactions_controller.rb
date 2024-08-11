@@ -12,31 +12,22 @@ class Api::V1::TransactionsController < ApplicationController
     amount = params[:amount].to_i
   
     if amount <= 0
-      return render_raw_response({
-                                   title: Rack::Utils::HTTP_STATUS_CODES[400],
-                                   detail: 'Amount must be positive'
-                                 }, status: :bad_request)
+      return render_bad_request('Amount must be positive')
     end
   
     if TransactionServices::Deposit.new(wallet_id: @wallet.id, amount: amount).call
-      render_raw_response({
-                            title: Rack::Utils::HTTP_STATUS_CODES[200],
-                            detail: 'Deposit succeeded'
-                          }, status: :ok)
+      render_success('Deposit succeeded')
     end
   rescue ActiveRecord::RecordInvalid => e
     render_bad_request(e)
   rescue ArgumentError => e
-    render_raw_response({
-                          title: Rack::Utils::HTTP_STATUS_CODES[400],
-                          detail: e.message
-                        }, status: :bad_request)
+    render_bad_request(e)
   end  
 
   def withdraw
     process_transaction(params[:amount]) do
       if TransactionServices::Withdraw.new(wallet_id: @wallet.id, amount: params[:amount].to_i).call
-        render_success('withdraw succeed')
+        render_success('Withdraw succeeded')
       end
     end
   rescue ActiveRecord::RecordInvalid => e
@@ -51,7 +42,7 @@ class Api::V1::TransactionsController < ApplicationController
       destination_wallet_id: params[:destination_wallet_id],
       amount: params[:amount].to_i
     ).call
-      render_success('transfer succeed')
+      render_success('Transfer succeeded')
     end
   rescue ActiveRecord::RecordInvalid => e
     render_bad_request(e)

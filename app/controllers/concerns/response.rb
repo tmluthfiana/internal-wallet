@@ -11,7 +11,18 @@ module Response
   end
 
   def render_unauthorized(exception)
-    render_error_response(:unauthorized, 'Unauthorized', exception.message)
+    error_message = case exception
+                    when Jwt::Errors::MissingToken
+                      'Missing refresh token'
+                    when Jwt::Errors::InvalidToken
+                      'Invalid refresh token'
+                    when Jwt::Errors::ExpiredToken
+                      'Expired refresh token'
+                    else
+                      exception.message
+                    end
+  
+    render json: { error: error_message }, status: :unauthorized
   end
 
   def render_unprocessable_entity(exception)
@@ -22,8 +33,12 @@ module Response
     render_error_response(:not_found, 'Not Found', exception.message)
   end
 
-  def render_bad_request(exception)
-    render_error_response(:bad_request, 'Bad Request', exception.message)
+  def render_bad_request(exception_or_message)
+    if exception_or_message.is_a?(Exception)
+      render_error_response(:bad_request, 'Bad Request', exception_or_message.message)
+    else
+      render_error_response(:bad_request, 'Bad Request', exception_or_message)
+    end
   end
 
   def render_success(detail)
