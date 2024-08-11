@@ -3,7 +3,7 @@ class CreateWallets < ActiveRecord::Migration[7.0]
     create_table :wallets do |t|
       t.bigint :entity_id  
       t.string :entity_type
-      t.integer :balance, default: 0
+      t.decimal :balance, precision: 10, scale: 2, default: 0.0
 
       t.timestamps
     end

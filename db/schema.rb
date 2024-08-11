@@ -52,7 +52,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_08_11_084243) do
   create_table "wallets", force: :cascade do |t|
     t.bigint "entity_id"
     t.string "entity_type"
-    t.integer "balance", default: 0
+    t.decimal "balance", precision: 10, scale: 2, default: "0.0"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
