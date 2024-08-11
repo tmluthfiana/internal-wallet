@@ -11,7 +11,7 @@ module Response
   end
 
   def render_unauthorized(exception)
-    render_error_response(:unauthorized, exception.message)
+    render json: { error: exception.message }, status: :unauthorized
   end
 
   def render_unprocessable_entity(exception)
