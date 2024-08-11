@@ -6,10 +6,8 @@ module Response
     rescue_from ActionController::ParameterMissing, with: :render_unprocessable_entity
   end
 
-  def render_raw_response(payload, status:)
-    payload.deep_stringify_keys!
-    payload = payload.slice('title', 'detail', 'data')
-    render json: Oj.dump(payload.compact), status:
+  def render_raw_response(response_hash, status: :ok)
+    render json: response_hash, status: status
   end
 
   def render_unauthorized(exception)
