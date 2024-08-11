@@ -26,4 +26,15 @@ module Jwt::Errors
       super(msg)
     end
   end
+
+  class ExpiredToken < StandardError
+    def initialize(token:)
+      msg = if token == 'access_token'
+              'Expired access token'
+            else
+              'Expired refresh token'
+            end
+      super(msg)
+    end
+  end
 end

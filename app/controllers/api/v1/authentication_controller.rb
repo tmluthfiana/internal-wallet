@@ -14,8 +14,18 @@ class Api::V1::AuthenticationController < ApplicationController
   end
 
   def refresh_token
+    if params[:refresh_token].blank?
+      raise Jwt::Errors::MissingToken.new(token: 'refresh_token')
+    end
+
     access_token, refresh_token, exp = Jwt::Refresher.refresh!(params[:refresh_token], @decoded_token, @current_user)
     render_raw_response(succeed_payload(access_token:, refresh_token:, exp:), status: :ok)
+  rescue Jwt::Errors::ExpiredToken => e
+    render_unauthorized(e)
+  rescue Jwt::Errors::InvalidToken => e
+    render_unauthorized(e)
+  rescue Jwt::Errors::MissingToken => e
+    render_unauthorized(e)
   rescue StandardError => e
     render_unauthorized(e)
   end

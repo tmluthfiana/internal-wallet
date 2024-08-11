@@ -13,12 +13,7 @@ module Response
   end
 
   def render_unauthorized(exception)
-    render_raw_response(
-      {
-        title: Rack::Utils::HTTP_STATUS_CODES[401],
-        detail: exception.message
-      }, status: :unauthorized
-    )
+    render json: { error: exception.message }, status: :unauthorized
   end
 
   def render_unprocessable_entity(exception)
