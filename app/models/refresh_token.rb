@@ -11,14 +11,17 @@ class RefreshToken < ApplicationRecord
   end
 
   def expired?
-    Time.current > created_at + 1.day
+    Time.current > created_at + 1.day + 1.second
   end
 
   private
 
   def set_crypted_token
-    self.token = SecureRandom.hex
-    self.crypted_token = Digest::SHA256.hexdigest(self.token)
-  end  
+    if token.present?
+      self.crypted_token = Digest::SHA256.hexdigest(token)
+    else
+      self.token ||= SecureRandom.hex
+      self.crypted_token = Digest::SHA256.hexdigest(self.token)
+    end
+  end
 end
-

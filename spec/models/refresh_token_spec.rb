@@ -18,6 +18,11 @@ RSpec.describe RefreshToken, type: :model do
     it 'should have a crypted_token after creation' do
       expect(refresh_token.crypted_token).not_to be_nil
     end
+
+    it 'should not be valid without a user' do
+      token = RefreshToken.new
+      expect(token).to_not be_valid
+    end
   end
 
   context 'methods' do
@@ -27,6 +32,13 @@ RSpec.describe RefreshToken, type: :model do
         refresh_token = RefreshToken.new(user: user, token: token)
         refresh_token.send(:set_crypted_token)
         expect(refresh_token.crypted_token).to eq(Digest::SHA256.hexdigest(refresh_token.token))
+      end
+
+      it 'does not overwrite crypted_token if token is not set' do
+        refresh_token = RefreshToken.create!(user: user)
+        original_crypted_token = refresh_token.crypted_token
+        refresh_token.send(:set_crypted_token)
+        expect(refresh_token.crypted_token).to eq(original_crypted_token)
       end
     end
 
@@ -38,6 +50,13 @@ RSpec.describe RefreshToken, type: :model do
 
       it 'returns nil for a non-existent token' do
         expect(RefreshToken.search_by_token('non_existent_token')).to be_nil
+      end
+
+      it 'finds token using partial token' do
+        partial_token = refresh_token.token[0..7]  # Partial token for testing
+        crypted_partial = Digest::SHA256.hexdigest(partial_token)
+        create(:refresh_token, crypted_token: crypted_partial, user: user)
+        expect(RefreshToken.search_by_token(partial_token)).to be_nil  # Should return nil as it's not exact match
       end
     end
 
@@ -51,6 +70,11 @@ RSpec.describe RefreshToken, type: :model do
         recent_token = RefreshToken.create!(user: user)
         expect(recent_token).not_to be_expired
       end
+
+      it 'returns false if the token is exactly 1 day old' do
+        token_1_day_old = RefreshToken.create!(user: user, created_at: 1.day.ago)
+        expect(token_1_day_old).not_to be_expired
+      end      
     end
   end
 end
