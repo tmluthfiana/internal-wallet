@@ -15,8 +15,10 @@ class Transaction < ApplicationRecord
 
   def to_builder
     Jbuilder.new do |builder|
-      builder.call(self, :id, :transaction_type, :amount)
-    end
+      builder.id id
+      builder.transaction_type transaction_type
+      builder.amount amount
+    end.attributes!
   end
 
   def balance_sufficient?
